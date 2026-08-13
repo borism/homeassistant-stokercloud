@@ -7,6 +7,6 @@
   "config_flow": true,
   "dependencies": ["http"],
   "codeowners": ["KristianOellegaard"],
-  "requirements": ["stokercloud-client @ git+https://github.com/borism/stokercloud-client.git"],
+  "requirements": ["stokercloud-client @ git+https://github.com/borism/stokercloud-client.git@develop"],
   "iot_class": "cloud_polling"
 }
