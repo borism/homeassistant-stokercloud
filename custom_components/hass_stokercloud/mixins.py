@@ -33,5 +33,11 @@ class StokerCloudControllerMixin:
         logger.debug("Updating %s" % self.name)
         self.controller_data = self.client.controller_data()
         if self.client_key:
-            self._state = getattr(self.controller_data, self.client_key)
+            try:
+                self._state = getattr(self.controller_data, self.client_key)
+            except TypeError:
+                # StokerCloud reports null for some values while the boiler is
+                # idle (e.g. -wantedboilertemp), and the client blows up
+                # converting None to Decimal. Treat as "no value".
+                self._state = None
         logger.debug("New state %s" % self._state)
