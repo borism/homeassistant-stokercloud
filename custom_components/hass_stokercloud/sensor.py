@@ -39,6 +39,7 @@ async def async_setup_entry(hass, config, async_add_entities):
         StokerCloudControllerSensor(client, serial, 'Boiler Effect', 'boiler_kwh', SensorDeviceClass.POWER),
         StokerCloudControllerSensor(client, serial, 'Total Consumption', 'consumption_total', state_class=SensorStateClass.TOTAL_INCREASING), # state class STATE_CLASS_TOTAL_INCREASING
         StokerCloudControllerSensor(client, serial, 'State', 'state'),
+        StokerCloudControllerSensor(client, serial, 'Outside Temperature', 'outside_temperature', SensorDeviceClass.TEMPERATURE),
 
         StokerCloudWaterHeaterTemperatureSensor(client, serial, 'Current Water Heater Temperature', 'hotwater_temperature_current'),
         StokerCloudWaterHeaterTemperatureSensor(client, serial, 'Requested Water Heater Temperature', 'hotwater_temperature_requested'),
