@@ -40,6 +40,7 @@ async def async_setup_entry(hass, config, async_add_entities):
         StokerCloudControllerSensor(client, serial, 'Total Consumption', 'consumption_total', state_class=SensorStateClass.TOTAL_INCREASING), # state class STATE_CLASS_TOTAL_INCREASING
         StokerCloudControllerSensor(client, serial, 'State', 'state'),
         StokerCloudControllerSensor(client, serial, 'Outside Temperature', 'outside_temperature', SensorDeviceClass.TEMPERATURE),
+        StokerCloudChartSensor(client, serial, 'External Temperature', 'drift_exttemp', SensorDeviceClass.TEMPERATURE, UnitOfTemperature.CELSIUS),
 
         StokerCloudWaterHeaterTemperatureSensor(client, serial, 'Current Water Heater Temperature', 'hotwater_temperature_current'),
         StokerCloudWaterHeaterTemperatureSensor(client, serial, 'Requested Water Heater Temperature', 'hotwater_temperature_requested'),
@@ -95,6 +96,34 @@ class StokerCloudControllerSensor(StokerCloudControllerMixin, SensorEntity):
                 Unit.DEGREE: UnitOfTemperature.CELSIUS,
                 Unit.KILO_GRAM: UnitOfMass.KILOGRAMS,
             }.get(self._state.unit)
+
+class StokerCloudChartSensor(SensorEntity):
+    """A reading that only exists in StokerCloud's chart data.
+
+    The controller publishes more than controllerdata2 returns; the rest is
+    reachable as chart series. Doesn't use StokerCloudControllerMixin because
+    that one is built around controller_data attributes.
+    """
+
+    def __init__(self, client: StokerCloudClient, serial, name: str, series: str, device_class, unit):
+        self.client = client
+        self._serial = serial
+        self._name = name
+        self._series = series
+        self._attr_device_class = device_class
+        self._attr_native_unit_of_measurement = unit
+
+    @property
+    def unique_id(self):
+        return f'{self._serial}-{self._name}'
+
+    @property
+    def name(self) -> str:
+        return "NBE %s" % self._name
+
+    def update(self) -> None:
+        self._attr_native_value = self.client.chart_values().get(self._series)
+
 
 class StokerCloudWaterHeaterTemperatureSensor(StokerCloudControllerMixin, SensorEntity):
     """Representation of a Water Heater Temperature Sensor."""
