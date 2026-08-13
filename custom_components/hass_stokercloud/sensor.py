@@ -44,6 +44,12 @@ async def async_setup_entry(hass, config, async_add_entities):
         StokerCloudChartSensor(client, serial, 'Drop Shaft Temperature', 'drift_skakt_temp', SensorDeviceClass.TEMPERATURE, UnitOfTemperature.CELSIUS),
         StokerCloudControllerSensor(client, serial, 'Oxygen', 'oxygen'),
         StokerCloudControllerSensor(client, serial, 'Oxygen Requested', 'oxygen_requested'),
+        StokerCloudControllerSensor(client, serial, 'Daily Consumption', 'consumption_day', state_class=SensorStateClass.MEASUREMENT),
+        StokerCloudControllerSensor(client, serial, 'Zone 1 Temperature', 'zone1_temperature_current', SensorDeviceClass.TEMPERATURE),
+        StokerCloudControllerSensor(client, serial, 'Zone 1 Temperature Requested', 'zone1_temperature_requested', SensorDeviceClass.TEMPERATURE),
+        StokerCloudControllerSensor(client, serial, 'Zone 1 Temperature Calculated', 'zone1_temperature_calculated', SensorDeviceClass.TEMPERATURE),
+        StokerCloudControllerSensor(client, serial, 'Substate', 'substate'),
+        StokerCloudControllerSensor(client, serial, 'Substate Seconds', 'substate_seconds'),
 
         StokerCloudWaterHeaterTemperatureSensor(client, serial, 'Current Water Heater Temperature', 'hotwater_temperature_current'),
         StokerCloudWaterHeaterTemperatureSensor(client, serial, 'Requested Water Heater Temperature', 'hotwater_temperature_requested'),
