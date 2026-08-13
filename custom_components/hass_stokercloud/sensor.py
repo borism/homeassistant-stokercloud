@@ -92,14 +92,16 @@ class StokerCloudControllerSensor(StokerCloudControllerMixin, SensorEntity):
     @property
     def native_value(self):
         """Return the value reported by the sensor."""
-        if self._state:
+        # `is not None`, not truthiness: a plain 0 (substate seconds, a
+        # stopped pump) is a real reading, not a missing one.
+        if self._state is not None:
             if isinstance(self._state, Value):
                 return self._state.value
             return self._state
 
     @property
     def native_unit_of_measurement(self):
-        if self._state and isinstance(self._state, Value):
+        if self._state is not None and isinstance(self._state, Value):
             return {
                 Unit.KWH: UnitOfPower.WATT,
                 Unit.DEGREE: UnitOfTemperature.CELSIUS,
@@ -147,7 +149,7 @@ class StokerCloudWaterHeaterTemperatureSensor(StokerCloudControllerMixin, Sensor
     @property
     def native_value(self):
         """Return the value reported by the water heater temperature sensor with 2 decimal places."""
-        if self._state:
+        if self._state is not None:
             if hasattr(self._state, 'value'):
                 return round(self._state.value, 2)  # Round to 2 decimal places
             return round(self._state, 2)
