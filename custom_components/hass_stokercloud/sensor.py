@@ -17,7 +17,7 @@ from stokercloud.client import Client as StokerCloudClient
 
 
 import datetime
-from homeassistant.const import CONF_USERNAME, UnitOfPower, UnitOfTemperature, UnitOfMass
+from homeassistant.const import CONF_USERNAME, PERCENTAGE, UnitOfPower, UnitOfTemperature, UnitOfMass
 from .const import DOMAIN
 from .mixins import StokerCloudControllerMixin
 
@@ -41,6 +41,9 @@ async def async_setup_entry(hass, config, async_add_entities):
         StokerCloudControllerSensor(client, serial, 'State', 'state'),
         StokerCloudControllerSensor(client, serial, 'Outside Temperature', 'outside_temperature', SensorDeviceClass.TEMPERATURE),
         StokerCloudChartSensor(client, serial, 'External Temperature', 'drift_exttemp', SensorDeviceClass.TEMPERATURE, UnitOfTemperature.CELSIUS),
+        StokerCloudChartSensor(client, serial, 'Drop Shaft Temperature', 'drift_skakt_temp', SensorDeviceClass.TEMPERATURE, UnitOfTemperature.CELSIUS),
+        StokerCloudControllerSensor(client, serial, 'Oxygen', 'oxygen'),
+        StokerCloudControllerSensor(client, serial, 'Oxygen Requested', 'oxygen_requested'),
 
         StokerCloudWaterHeaterTemperatureSensor(client, serial, 'Current Water Heater Temperature', 'hotwater_temperature_current'),
         StokerCloudWaterHeaterTemperatureSensor(client, serial, 'Requested Water Heater Temperature', 'hotwater_temperature_requested'),
@@ -95,6 +98,7 @@ class StokerCloudControllerSensor(StokerCloudControllerMixin, SensorEntity):
                 Unit.KWH: UnitOfPower.WATT,
                 Unit.DEGREE: UnitOfTemperature.CELSIUS,
                 Unit.KILO_GRAM: UnitOfMass.KILOGRAMS,
+                Unit.PERCENT: PERCENTAGE,
             }.get(self._state.unit)
 
 class StokerCloudChartSensor(SensorEntity):
