@@ -8,6 +8,7 @@ from homeassistant.components.binary_sensor import (
 )
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
@@ -132,6 +133,15 @@ class StokerCloudChartSensor(SensorEntity):
     @property
     def name(self) -> str:
         return "NBE %s" % self._name
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Group all entities for this boiler under one device."""
+        return DeviceInfo(
+            identifiers={(DOMAIN, self._serial)},
+            name=f"NBE StokerCloud ({self._serial})",
+            manufacturer="NBE",
+        )
 
     def update(self) -> None:
         self._attr_native_value = self.client.chart_values().get(self._series)

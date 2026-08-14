@@ -1,4 +1,7 @@
 from stokercloud.client import Client as StokerCloudClient
+from homeassistant.helpers.entity import DeviceInfo
+
+from .const import DOMAIN
 
 import logging
 
@@ -19,6 +22,15 @@ class StokerCloudControllerMixin:
     def unique_id(self):
         """The unique id of the sensor."""
         return f'{self._serial}-{self._name}'
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Group all entities for this boiler under one device."""
+        return DeviceInfo(
+            identifiers={(DOMAIN, self._serial)},
+            name=f"NBE StokerCloud ({self._serial})",
+            manufacturer="NBE",
+        )
 
     @property
     def name(self) -> str:
