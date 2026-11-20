@@ -18,8 +18,8 @@ from stokercloud.client import Client as StokerCloudClient
 
 
 import datetime
-from homeassistant.const import CONF_USERNAME, PERCENTAGE, UnitOfPower, UnitOfTemperature, UnitOfMass
-from .const import DOMAIN
+from homeassistant.const import CONF_USERNAME, PERCENTAGE, UnitOfEnergy, UnitOfPower, UnitOfTemperature, UnitOfMass
+from .const import CALORIFIC_VALUE_KWH_PER_KG, DOMAIN
 from .mixins import StokerCloudControllerMixin
 
 import logging
@@ -39,6 +39,7 @@ async def async_setup_entry(hass, config, async_add_entities):
         StokerCloudControllerSensor(client, serial, 'Boiler Temperature Requested', 'boiler_temperature_requested', SensorDeviceClass.TEMPERATURE),
         StokerCloudControllerSensor(client, serial, 'Boiler Effect', 'boiler_kwh', SensorDeviceClass.POWER),
         StokerCloudControllerSensor(client, serial, 'Total Consumption', 'consumption_total', state_class=SensorStateClass.TOTAL_INCREASING), # state class STATE_CLASS_TOTAL_INCREASING
+        StokerCloudPelletEnergySensor(client, serial, 'Pellet Energy', 'consumption_total'),
         StokerCloudControllerSensor(client, serial, 'State', 'state'),
         StokerCloudControllerSensor(client, serial, 'Outside Temperature', 'outside_temperature', SensorDeviceClass.TEMPERATURE),
         StokerCloudChartSensor(client, serial, 'External Temperature', 'drift_exttemp', SensorDeviceClass.TEMPERATURE, UnitOfTemperature.CELSIUS),
@@ -109,6 +110,19 @@ class StokerCloudControllerSensor(StokerCloudControllerMixin, SensorEntity):
                 Unit.KILO_GRAM: UnitOfMass.KILOGRAMS,
                 Unit.PERCENT: PERCENTAGE,
             }.get(self._state.unit)
+
+class StokerCloudPelletEnergySensor(StokerCloudControllerMixin, SensorEntity):
+    """Energy content of the pellets burned: total consumption (kg) x kWh/kg."""
+
+    _attr_device_class = SensorDeviceClass.ENERGY
+    _attr_state_class = SensorStateClass.TOTAL_INCREASING
+    _attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
+
+    @property
+    def native_value(self):
+        if isinstance(self._state, Value):
+            return round(float(self._state.value) * CALORIFIC_VALUE_KWH_PER_KG, 1)
+
 
 class StokerCloudChartSensor(SensorEntity):
     """A reading that only exists in StokerCloud's chart data.

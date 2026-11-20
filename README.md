@@ -40,3 +40,13 @@ Currently the integration is read-only so you do not need to enter your password
 
 If the entities added are "Unknown" - Please give the integration a few minutes to fetch the data.
 An alternative to waiting is to restart HA.
+
+
+# Pellet energy and consumption history
+
+The integration provides pellet use as energy, in two forms:
+
+* **`Pellet Energy` sensor** - total pellet consumption (kg) multiplied by 4.8 kWh/kg, a typical value for wood pellets (the `CALORIFIC_VALUE_KWH_PER_KG` constant in `const.py`). It is a `total_increasing` energy sensor.
+* **Imported statistics** - on startup, and then once an hour, the integration reads StokerCloud's consumption history and imports it as long-term statistics: `hass_stokercloud:pellet_consumption_<id>` (kg) and `hass_stokercloud:pellet_energy_<id>` (kWh), where `<id>` is your lowercased StokerCloud username. The first run back-fills the history StokerCloud provides (about 24 days); later runs append each completed hour. These are not entities; find them in the Energy dashboard's source picker or in a statistics graph card.
+
+In the Energy dashboard, pick **either** the `Pellet Energy` sensor **or** the imported `pellet_energy` statistic as the source, **not both**, or the same pellets are counted twice. Choose the imported statistic if you want the back-filled history; choose the sensor if you only need data from now on.
