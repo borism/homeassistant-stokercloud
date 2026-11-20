@@ -35,6 +35,8 @@ async def async_setup_entry(hass, config, async_add_entities):
     async_add_entities([
         StokerCloudControllerBinarySensor(client, serial, 'Running', 'running', 'power'),
         StokerCloudControllerBinarySensor(client, serial, 'Alarm', 'alarm', 'problem'),
+        StokerCloudControllerOutputBinarySensor(client, serial, 'DHW Valve', 'dhw_valve', 'opening'),
+        StokerCloudControllerOutputBinarySensor(client, serial, 'Circulation Pump', 'circulation_pump', 'running'),
         StokerCloudControllerSensor(client, serial, 'Boiler Temperature', 'boiler_temperature_current', SensorDeviceClass.TEMPERATURE),
         StokerCloudControllerSensor(client, serial, 'Boiler Temperature Requested', 'boiler_temperature_requested', SensorDeviceClass.TEMPERATURE),
         StokerCloudControllerSensor(client, serial, 'Boiler Effect', 'boiler_kwh', SensorDeviceClass.POWER),
@@ -75,6 +77,16 @@ class StokerCloudControllerBinarySensor(StokerCloudControllerMixin, BinarySensor
     @property
     def device_class(self):
         return self._device_class
+
+
+class StokerCloudControllerOutputBinarySensor(StokerCloudControllerBinarySensor):
+    """A controller output (valve, pump). Unknown when the controller doesn't report it."""
+
+    @property
+    def is_on(self):
+        if self._state is None:
+            return None
+        return self._state is PowerState.ON
 
 
 class StokerCloudControllerSensor(StokerCloudControllerMixin, SensorEntity):
